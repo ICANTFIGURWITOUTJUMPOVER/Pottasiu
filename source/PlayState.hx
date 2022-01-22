@@ -401,7 +401,7 @@ class PlayState extends MusicBeatState
 		switch (curStage)
 		{
 			case 'cyberBG':
-				var cbg:BGSprite = new BGSprite(-93.4, -407.05).loadGraphic(Paths.image('tutorial/bg',  1, 1)'));
+				var cbg:BGSprite = new BGSprite('tutorial/BG', -93.4, -407.05,  1, 1)');
 				add(cbg);
 				}
 
