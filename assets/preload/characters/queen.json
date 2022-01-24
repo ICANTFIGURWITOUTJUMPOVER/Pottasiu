@@ -1,0 +1,78 @@
+{
+	"animations": [
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"anim": "idle",
+			"fps": 24,
+			"name": "queen idle",
+			"indices": []
+		},
+		{
+			"offsets": [
+				-3,
+				14
+			],
+			"loop": false,
+			"anim": "singUP",
+			"fps": 24,
+			"name": "queen up",
+			"indices": []
+		},
+		{
+			"offsets": [
+				-31,
+				3
+			],
+			"loop": false,
+			"anim": "singRIGHT",
+			"fps": 24,
+			"name": "queen right",
+			"indices": []
+		},
+		{
+			"offsets": [
+				60,
+				-42
+			],
+			"loop": false,
+			"anim": "singDOWN",
+			"fps": 24,
+			"name": "queen down",
+			"indices": []
+		},
+		{
+			"offsets": [
+				22,
+				-3
+			],
+			"loop": false,
+			"anim": "singLEFT",
+			"fps": 24,
+			"name": "queen left",
+			"indices": []
+		}
+	],
+	"no_antialiasing": false,
+	"image": "characters/queen",
+	"position": [
+		0,
+		0
+	],
+	"healthicon": "queen",
+	"flip_x": false,
+	"healthbar_colors": [
+		175,
+		102,
+		206
+	],
+	"camera_position": [
+		0,
+		0
+	],
+	"sing_duration": 6.1,
+	"scale": 1
+}
