@@ -1,6 +1,5 @@
 package;
 
-import flixel.addons.ui.SwatchData;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.addons.text.FlxTypeText;
@@ -25,48 +24,30 @@ class DialogueBox extends FlxSpriteGroup
 	// SECOND DIALOGUE FOR THE PIXEL SHIT INSTEAD???
 	var swagDialogue:FlxTypeText;
 
-	public var finishThing:Void->Void;
+	var dropText:FlxText;
 
+	public var finishThing:Void->Void;
+	public var nextDialogueThing:Void->Void = null;
+	public var skipDialogueThing:Void->Void = null;
+
+	var portraitLeft:FlxSprite;
 	var portraitRight:FlxSprite;
 
-	var gf:FlxSprite;
-	var queenNORMAL:FlxSprite;
-	
-	var queenANGRY:FlxSprite;
-	var queenANGRYHAPPY:FlxSprite;
-	var queenBRO:FlxSprite;
-	var queenCONFUSED:FlxSprite;
-	var queenEXCITED:FlxSprite;
-	var queenHAHA:FlxSprite;
-	var queenHAPPY:FlxSprite;
-	var queenHATE:FlxSprite;
-	var queenIDK:FlxSprite;
-	var queenLMAO:FlxSprite;
-	var queenLYING:FlxSprite;
-	var queenNICE:FlxSprite;
-	var queenPOG:FlxSprite;
-	var queenWHAT:FlxSprite;
-	var queen777:FlxSprite;
-	var queenSHOKED:FlxSprite;
-	var queenSMUGEVIL:FlxSprite;
-	var queenTRUE:FlxSprite;
-	var queenWORRIED:FlxSprite;
-
-	var susieMAD:FlxSprite;
-	var susieLEFT:FlxSprite;
-	var susiePAIN:FlxSprite;
-
+	var handSelect:FlxSprite;
 	var bgFade:FlxSprite;
 
-	public function new(talkingRight:Bool = true, ?dialogueList:Array<String>, box_X:Float = 50.65, box_Y:Float = 384.25)
+	public function new(talkingRight:Bool = true, ?dialogueList:Array<String>)
 	{
 		super();
 
 		switch (PlayState.SONG.song.toLowerCase())
 		{
-			default:
-				FlxG.sound.playMusic(Paths.music('RoyalEncounter'), 0);
-				FlxG.sound.music.fadeIn(1, 0, 0.5);
+			case 'senpai':
+				FlxG.sound.playMusic(Paths.music('Lunchbox'), 0);
+				FlxG.sound.music.fadeIn(1, 0, 0.8);
+			case 'thorns':
+				FlxG.sound.playMusic(Paths.music('LunchboxScary'), 0);
+				FlxG.sound.music.fadeIn(1, 0, 0.8);
 		}
 
 		bgFade = new FlxSprite(-200, -200).makeGraphic(Std.int(FlxG.width * 1.3), Std.int(FlxG.height * 1.3), 0xFFB3DFd8);
@@ -86,233 +67,82 @@ class DialogueBox extends FlxSpriteGroup
 		var hasDialog = false;
 		switch (PlayState.SONG.song.toLowerCase())
 		{
-			case 'palace-raid','tutorial':
+			case 'senpai':
 				hasDialog = true;
-				box.frames = Paths.getSparrowAtlas('speech_bubble_talking', 'shared');
-				box.animation.addByPrefix('normalOpen', 'Speech Bubble Normal Open', 24, false);
-				box.animation.addByPrefix('normal', 'speech bubble normal', 24, true);
-				box.x = box_X;
-				box.y = box_Y;
+				box.frames = Paths.getSparrowAtlas('weeb/pixelUI/dialogueBox-pixel');
+				box.animation.addByPrefix('normalOpen', 'Text Box Appear', 24, false);
+				box.animation.addByIndices('normal', 'Text Box Appear instance 1', [4], "", 24);
+			case 'roses':
+				hasDialog = true;
+				FlxG.sound.play(Paths.sound('ANGRY_TEXT_BOX'));
+
+				box.frames = Paths.getSparrowAtlas('weeb/pixelUI/dialogueBox-senpaiMad');
+				box.animation.addByPrefix('normalOpen', 'SENPAI ANGRY IMPACT SPEECH', 24, false);
+				box.animation.addByIndices('normal', 'SENPAI ANGRY IMPACT SPEECH instance 1', [4], "", 24);
+
+			case 'thorns':
+				hasDialog = true;
+				box.frames = Paths.getSparrowAtlas('weeb/pixelUI/dialogueBox-evil');
+				box.animation.addByPrefix('normalOpen', 'Spirit Textbox spawn', 24, false);
+				box.animation.addByIndices('normal', 'Spirit Textbox spawn instance 1', [11], "", 24);
+
+				var face:FlxSprite = new FlxSprite(320, 170).loadGraphic(Paths.image('weeb/spiritFaceForward'));
+				face.setGraphicSize(Std.int(face.width * 6));
+				add(face);
 		}
 
 		this.dialogueList = dialogueList;
 		
 		if (!hasDialog)
 			return;
-		box.animation.play('normalOpen');
-		box.antialiasing = false;
-		box.updateHitbox();
-		add(box);
+		
+		portraitLeft = new FlxSprite(-20, 40);
+		portraitLeft.frames = Paths.getSparrowAtlas('weeb/senpaiPortrait');
+		portraitLeft.animation.addByPrefix('enter', 'Senpai Portrait Enter', 24, false);
+		portraitLeft.setGraphicSize(Std.int(portraitLeft.width * PlayState.daPixelZoom * 0.9));
+		portraitLeft.updateHitbox();
+		portraitLeft.scrollFactor.set();
+		add(portraitLeft);
+		portraitLeft.visible = false;
 
-		queenNORMAL = new FlxSprite(134, 446).loadGraphic(Paths.image('portraits/queen/normal','queen'));
-		queenNORMAL.setGraphicSize(Std.int(queenNORMAL.width = 180));
-		queenNORMAL.antialiasing = false;
-		queenNORMAL.updateHitbox();
-		queenNORMAL.scrollFactor.set();
-		add(queenNORMAL);
-		queenNORMAL.visible = false;
-
-		queenANGRY = new FlxSprite(134, 446).loadGraphic(Paths.image('portraits/queen/angry','queen'));
-		queenANGRY.setGraphicSize(Std.int(queenNORMAL.width = 180));
-		queenANGRY.antialiasing = false;
-		queenANGRY.updateHitbox();
-		queenANGRY.scrollFactor.set();
-		add(queenANGRY);
-		queenANGRY.visible = false;
-
-		queenANGRYHAPPY = new FlxSprite(134, 446).loadGraphic(Paths.image('portraits/queen/angry-happy','queen'));
-		queenANGRYHAPPY.setGraphicSize(Std.int(queenNORMAL.width = 180));
-		queenANGRYHAPPY.antialiasing = false;
-		queenANGRYHAPPY.updateHitbox();
-		queenANGRYHAPPY.scrollFactor.set();
-		add(queenANGRYHAPPY);
-		queenANGRYHAPPY.visible = false;
-
-		queenBRO = new FlxSprite(134, 446).loadGraphic(Paths.image('portraits/queen/BRO','queen'));
-		queenBRO.setGraphicSize(Std.int(queenNORMAL.width = 180));
-		queenBRO.antialiasing = false;
-		queenBRO.updateHitbox();
-		queenBRO.scrollFactor.set();
-		add(queenBRO);
-		queenBRO.visible = false;
-
-		queenCONFUSED = new FlxSprite(134, 446).loadGraphic(Paths.image('portraits/queen/confused','queen'));
-		queenCONFUSED.setGraphicSize(Std.int(queenCONFUSED.width = 180));
-		queenCONFUSED.antialiasing = false;
-		queenCONFUSED.updateHitbox();
-		queenCONFUSED.scrollFactor.set();
-		add(queenCONFUSED);
-		queenCONFUSED.visible = false;
-
-		queenEXCITED = new FlxSprite(134, 446).loadGraphic(Paths.image('portraits/queen/excited','queen'));
-		queenEXCITED.setGraphicSize(Std.int(queenEXCITED.width = 180));
-		queenEXCITED.antialiasing = false;
-		queenEXCITED.updateHitbox();
-		queenEXCITED.scrollFactor.set();
-		add(queenEXCITED);
-		queenEXCITED.visible = false;
-
-		queenHAHA = new FlxSprite(134, 446).loadGraphic(Paths.image('portraits/queen/ha ha','queen'));
-		queenHAHA.setGraphicSize(Std.int(queenHAHA.width = 180));
-		queenHAHA.antialiasing = false;
-		queenHAHA.updateHitbox();
-		queenHAHA.scrollFactor.set();
-		add(queenHAHA);
-		queenHAHA.visible = false;
-
-		queenHAPPY = new FlxSprite(134, 446).loadGraphic(Paths.image('portraits/queen/happy','queen'));
-		queenHAPPY.setGraphicSize(Std.int(queenHAPPY.width = 180));
-		queenHAPPY.antialiasing = false;
-		queenHAPPY.updateHitbox();
-		queenHAPPY.scrollFactor.set();
-		add(queenHAPPY);
-		queenHAPPY.visible = false;
-
-		queenHATE = new FlxSprite(134, 446).loadGraphic(Paths.image('portraits/queen/hate','queen'));
-		queenHATE.setGraphicSize(Std.int(queenHATE.width = 180));
-		queenHATE.antialiasing = false;
-		queenHATE.updateHitbox();
-		queenHATE.scrollFactor.set();
-		add(queenHATE);
-		queenHATE.visible = false;
-
-		queenIDK = new FlxSprite(134, 446).loadGraphic(Paths.image('portraits/queen/idk','queen'));
-		queenIDK.setGraphicSize(Std.int(queenIDK.width = 180));
-		queenIDK.antialiasing = false;
-		queenIDK.updateHitbox();
-		queenIDK.scrollFactor.set();
-		add(queenIDK);
-		queenIDK.visible = false;
-
-		queenLMAO = new FlxSprite(134, 446).loadGraphic(Paths.image('portraits/queen/lmao','queen'));
-		queenLMAO.setGraphicSize(Std.int(queenLMAO.width = 180));
-		queenLMAO.antialiasing = false;
-		queenLMAO.updateHitbox();
-		queenLMAO.scrollFactor.set();
-		add(queenLMAO);
-		queenLMAO.visible = false;
-
-		queenLYING = new FlxSprite(134, 446).loadGraphic(Paths.image('portraits/queen/lying','queen'));
-		queenLYING.setGraphicSize(Std.int(queenLYING.width = 180));
-		queenLYING.antialiasing = false;
-		queenLYING.updateHitbox();
-		queenLYING.scrollFactor.set();
-		add(queenLYING);
-		queenLYING.visible = false;
-
-		queenNICE = new FlxSprite(134, 446).loadGraphic(Paths.image('portraits/queen/nice','queen'));
-		queenNICE.setGraphicSize(Std.int(queenNICE.width = 180));
-		queenNICE.antialiasing = false;
-		queenNICE.updateHitbox();
-		queenNICE.scrollFactor.set();
-		add(queenNICE);
-		queenNICE.visible = false;
-
-		queenPOG = new FlxSprite(134, 446).loadGraphic(Paths.image('portraits/queen/pog','queen'));
-		queenPOG.setGraphicSize(Std.int(queenPOG.width = 180));
-		queenPOG.antialiasing = false;
-		queenPOG.updateHitbox();
-		queenPOG.scrollFactor.set();
-		add(queenPOG);
-		queenPOG.visible = false;
-
-		queenWHAT = new FlxSprite(134, 446).loadGraphic(Paths.image('portraits/queen/questining','queen'));
-		queenWHAT.setGraphicSize(Std.int(queenWHAT.width = 180));
-		queenWHAT.antialiasing = false;
-		queenWHAT.updateHitbox();
-		queenWHAT.scrollFactor.set();
-		add(queenWHAT);
-		queenWHAT.visible = false;
-
-		queenSHOKED = new FlxSprite(134, 446).loadGraphic(Paths.image('portraits/queen/shoked','queen'));
-		queenSHOKED.setGraphicSize(Std.int(queenSHOKED.width = 180));
-		queenSHOKED.antialiasing = false;
-		queenSHOKED.updateHitbox();
-		queenSHOKED.scrollFactor.set();
-		add(queenSHOKED);
-		queenSHOKED.visible = false;
-
-		queenSMUGEVIL = new FlxSprite(134, 446).loadGraphic(Paths.image('portraits/queen/smug-evil','queen'));
-		queenSMUGEVIL.setGraphicSize(Std.int(queenSMUGEVIL.width = 180));
-		queenSMUGEVIL.antialiasing = false;
-		queenSMUGEVIL.updateHitbox();
-		queenSMUGEVIL.scrollFactor.set();
-		add(queenSMUGEVIL);
-		queenSMUGEVIL.visible = false;
-
-		queenTRUE = new FlxSprite(134, 446).loadGraphic(Paths.image('portraits/queen/true','queen'));
-		queenTRUE.setGraphicSize(Std.int(queenTRUE.width = 180));
-		queenTRUE.antialiasing = false;
-		queenTRUE.updateHitbox();
-		queenTRUE.scrollFactor.set();
-		add(queenTRUE);
-		queenTRUE.visible = false;
-
-		queenWORRIED = new FlxSprite(134, 446).loadGraphic(Paths.image('portraits/queen/worried','queen'));
-		queenWORRIED.setGraphicSize(Std.int(queenWORRIED.width = 180));
-		queenWORRIED.antialiasing = false;
-		queenWORRIED.updateHitbox();
-		queenWORRIED.scrollFactor.set();
-		add(queenWORRIED);
-		queenWORRIED.visible = false;
-
-		queen777 = new FlxSprite(134, 446).loadGraphic(Paths.image('portraits/queen/questionmarks','queen'));
-		queen777.setGraphicSize(Std.int(queen777.width = 180));
-		queen777.antialiasing = false;
-		queen777.updateHitbox();
-		queen777.scrollFactor.set();
-		add(queen777);
-		queen777.visible = false;
-
-		portraitRight = new FlxSprite(101.1, 467).loadGraphic(Paths.image('portraits/bf/newBfPortrait','queen'));
-		portraitRight.setGraphicSize(Std.int(portraitRight.width = 250));
+		portraitRight = new FlxSprite(0, 40);
+		portraitRight.frames = Paths.getSparrowAtlas('weeb/bfPortrait');
+		portraitRight.animation.addByPrefix('enter', 'Boyfriend portrait enter', 24, false);
+		portraitRight.setGraphicSize(Std.int(portraitRight.width * PlayState.daPixelZoom * 0.9));
 		portraitRight.updateHitbox();
-		portraitRight.antialiasing = false;
 		portraitRight.scrollFactor.set();
 		add(portraitRight);
 		portraitRight.visible = false;
+		
+		box.animation.play('normalOpen');
+		box.setGraphicSize(Std.int(box.width * PlayState.daPixelZoom * 0.9));
+		box.updateHitbox();
+		add(box);
 
-		gf = new FlxSprite(87.2, 453.2).loadGraphic(Paths.image('portraits/bf/gf', 'queen'));
-		gf.setGraphicSize(Std.int(gf.width = 278.85));
-		gf.updateHitbox();
-		gf.antialiasing = false;
-		gf.scrollFactor.set();
-		add(gf);
-		gf.visible = false;
+		box.screenCenter(X);
+		portraitLeft.screenCenter(X);
 
-		susieMAD = new FlxSprite(136, 452).loadGraphic(Paths.image('portraits/susie/mad','queen'));
-		susieMAD.setGraphicSize(Std.int(susieMAD.width = 187));
-		susieMAD.antialiasing = false;
-		susieMAD.updateHitbox();
-		susieMAD.scrollFactor.set();
-		add(susieMAD);
-		susieMAD.visible = false;
+		handSelect = new FlxSprite(1042, 590).loadGraphic(Paths.getPath('images/weeb/pixelUI/hand_textbox.png', IMAGE));
+		handSelect.setGraphicSize(Std.int(handSelect.width * PlayState.daPixelZoom * 0.9));
+		handSelect.updateHitbox();
+		handSelect.visible = false;
+		add(handSelect);
 
-		susieLEFT = new FlxSprite(136, 452).loadGraphic(Paths.image('portraits/susie/conserned','queen'));
-		susieLEFT.setGraphicSize(Std.int(susieLEFT.width = 187));
-		susieLEFT.antialiasing = false;
-		susieLEFT.updateHitbox();
-		susieLEFT.scrollFactor.set();
-		add(susieLEFT);
-		susieLEFT.visible = false;
-
-		susiePAIN = new FlxSprite(136, 452).loadGraphic(Paths.image('portraits/susie/wants-to-die','queen'));
-		susiePAIN.setGraphicSize(Std.int(susiePAIN.width = 187));
-		susiePAIN.antialiasing = false;
-		susiePAIN.updateHitbox();
-		susiePAIN.scrollFactor.set();
-		add(susiePAIN);
-		susiePAIN.visible = false;
 
 		if (!talkingRight)
 		{
 			// box.flipX = true;
 		}
 
-		swagDialogue = new FlxTypeText(400, 450, Std.int(FlxG.width * 0.6), "", 45);
-		swagDialogue.font = Paths.font("determination.otf");
-		swagDialogue.color = 0xFFFFFFFF;
-		swagDialogue.sounds = [FlxG.sound.load(Paths.sound('queen'), 0.9)];
+		dropText = new FlxText(242, 502, Std.int(FlxG.width * 0.6), "", 32);
+		dropText.font = 'Pixel Arial 11 Bold';
+		dropText.color = 0xFFD89494;
+		add(dropText);
+
+		swagDialogue = new FlxTypeText(240, 500, Std.int(FlxG.width * 0.6), "", 32);
+		swagDialogue.font = 'Pixel Arial 11 Bold';
+		swagDialogue.color = 0xFF3F2021;
+		swagDialogue.sounds = [FlxG.sound.load(Paths.sound('pixelText'), 0.6)];
 		add(swagDialogue);
 
 		dialogue = new Alphabet(0, 80, "", false, true);
@@ -322,16 +152,21 @@ class DialogueBox extends FlxSpriteGroup
 
 	var dialogueOpened:Bool = false;
 	var dialogueStarted:Bool = false;
+	var dialogueEnded:Bool = false;
 
 	override function update(elapsed:Float)
 	{
-		if(FlxG.keys.justPressed.ESCAPE)
+		// HARD CODING CUZ IM STUPDI
+		if (PlayState.SONG.song.toLowerCase() == 'roses')
+			portraitLeft.visible = false;
+		if (PlayState.SONG.song.toLowerCase() == 'thorns')
 		{
-			if(FlxG.sound.music != null)
-				FlxG.sound.music.stop();
-			finishThing();
-			kill();
+			portraitLeft.visible = false;
+			swagDialogue.color = FlxColor.WHITE;
+			dropText.color = FlxColor.BLACK;
 		}
+
+		dropText.text = swagDialogue.text;
 
 		if (box.animation.curAnim != null)
 		{
@@ -348,39 +183,67 @@ class DialogueBox extends FlxSpriteGroup
 			dialogueStarted = true;
 		}
 
-		if (PlayerSettings.player1.controls.ACCEPT && dialogueStarted == true)
+		#if mobile
+	    var justTouched:Bool = false;
+
+	    for (touch in FlxG.touches.list)
+	    {
+		    justTouched = false;
+
+		    if (touch.justPressed){
+			    justTouched = true;
+		    }
+	    }
+	    #end
+
+		if(PlayerSettings.player1.controls.ACCEPT#if mobile || justTouched #end)
 		{
-			remove(dialogue);
-				
-			FlxG.sound.play(Paths.sound('clickText'), 0.2);
-
-			if (dialogueList[1] == null && dialogueList[0] != null)
+			if (dialogueEnded)
 			{
-				if (!isEnding)
+				remove(dialogue);
+				if (dialogueList[1] == null && dialogueList[0] != null)
 				{
-					isEnding = true;
-
-					new FlxTimer().start(0.2, function(tmr:FlxTimer)
+					if (!isEnding)
 					{
-						box.alpha -= 1 / 5;
-						bgFade.alpha -= 1 / 5 * 0.7;
-						portraitRight.visible = false;
-						queenNORMAL.visible = false;
-						swagDialogue.alpha -= 1 / 5;
-						swagDialogue.sounds = [FlxG.sound.load(Paths.sound('queen'), 0)];
-					}, 5);
+						isEnding = true;
+						FlxG.sound.play(Paths.sound('clickText'), 0.8);	
 
-					new FlxTimer().start(1.2, function(tmr:FlxTimer)
-					{
-						finishThing();
-						kill();
-					});
+						if (PlayState.SONG.song.toLowerCase() == 'senpai' || PlayState.SONG.song.toLowerCase() == 'thorns')
+							FlxG.sound.music.fadeOut(1.5, 0);
+
+						new FlxTimer().start(0.2, function(tmr:FlxTimer)
+						{
+							box.alpha -= 1 / 5;
+							bgFade.alpha -= 1 / 5 * 0.7;
+							portraitLeft.visible = false;
+							portraitRight.visible = false;
+							swagDialogue.alpha -= 1 / 5;
+							handSelect.alpha -= 1 / 5;
+							dropText.alpha = swagDialogue.alpha;
+						}, 5);
+
+						new FlxTimer().start(1.5, function(tmr:FlxTimer)
+						{
+							finishThing();
+							kill();
+						});
+					}
+				}
+				else
+				{
+					dialogueList.remove(dialogueList[0]);
+					startDialogue();
+					FlxG.sound.play(Paths.sound('clickText'), 0.8);
 				}
 			}
-			else
+			else if (dialogueStarted)
 			{
-				dialogueList.remove(dialogueList[0]);
-				startDialogue();
+				FlxG.sound.play(Paths.sound('clickText'), 0.8);
+				swagDialogue.skip();
+				
+				if(skipDialogueThing != null) {
+					skipDialogueThing();
+				}
 			}
 		}
 		
@@ -399,116 +262,35 @@ class DialogueBox extends FlxSpriteGroup
 		// swagDialogue.text = ;
 		swagDialogue.resetText(dialogueList[0]);
 		swagDialogue.start(0.04, true);
+		swagDialogue.completeCallback = function() {
+			handSelect.visible = true;
+			dialogueEnded = true;
+		};
 
+		handSelect.visible = false;
+		dialogueEnded = false;
 		switch (curCharacter)
 		{
-			case 'queenNORMAL':
-				portaitTrue(queenNORMAL);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('queen'), 0.9)];
+			case 'dad':
+				portraitRight.visible = false;
+				if (!portraitLeft.visible)
+				{
+					if (PlayState.SONG.song.toLowerCase() == 'senpai') portraitLeft.visible = true;
+					portraitLeft.animation.play('enter');
+				}
 			case 'bf':
-				portaitTrue(portraitRight);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('bfText'), 0.7)];
-			case 'queenANGRY':
-				portaitTrue(queenANGRY);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('queen'), 0.9)];
-			case 'queenANGRYHAPPY':
-				portaitTrue(queenANGRYHAPPY);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('queen'), 0.9)];
-			case 'queenBRO':
-				portaitTrue(queenBRO);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('queen'), 0.9)];
-			case 'susieMAD':
-				portaitTrue(susieMAD);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('susieTalk'), 0.9)];
-			case 'susieLEFT':
-				portaitTrue(susieLEFT);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('susieTalk'), 0.9)];
-			case 'susiePAIN':
-				portaitTrue(susiePAIN);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('susieTalk'), 0.9)];
-			case 'queenCONFUSED':
-				portaitTrue(queenCONFUSED);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('queen'), 0.9)];
-			case 'queenEXCITED':
-				portaitTrue(queenEXCITED);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('queen'), 0.9)];
-			case 'queenHAHA':
-				portaitTrue(queenHAHA);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('queen'), 0.9)];
-			case 'queenHAPPY':
-				portaitTrue(queenHAPPY);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('queen'), 0.9)];
-			case 'queenHATE':
-				portaitTrue(queenHATE);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('queen'), 0.9)];
-			case 'queenIDK':
-				portaitTrue(queenIDK);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('queen'), 0.9)];
-			case 'queenLMAO':
-				portaitTrue(queenLMAO);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('queen'), 0.9)];
-			case 'queenLYING':
-				portaitTrue(queenLYING);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('queen'), 0.9)];
-			case 'queenNICE':
-				portaitTrue(queenNICE);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('queen'), 0.9)];
-			case 'queenPOG':
-				portaitTrue(queenPOG);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('queen'), 0.9)];
-			case 'queenWHAT':
-				portaitTrue(queenWHAT);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('queen'), 0.9)];
-			case 'queenSHOKED':
-				portaitTrue(queenSHOKED);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('queen'), 0.9)];
-			case 'queenSMUGEVIL':
-				portaitTrue(queenSMUGEVIL);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('queen'), 0.9)];
-			case 'queenTRUE':
-				portaitTrue(queenTRUE);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('queen'), 0.9)];
-			case 'queenWORRIED':
-				portaitTrue(queenWORRIED);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('queen'), 0.9)];
-			case 'queen???':
-				portaitTrue(queen777);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('queen'), 0.9)];
-			case 'gf':
-				portaitTrue(gf);
-				swagDialogue.sounds = [FlxG.sound.load(Paths.sound('gfText'), 0.7)];
+				portraitLeft.visible = false;
+				if (!portraitRight.visible)
+				{
+					portraitRight.visible = true;
+					portraitRight.animation.play('enter');
+				}
+		}
+		if(nextDialogueThing != null) {
+			nextDialogueThing();
 		}
 	}
 
-	function portaitTrue(open:FlxSprite) {
-		portraitRight.visible = false;
-		queenANGRY.visible = false;
-		queenANGRYHAPPY.visible = false;
-		queenNORMAL.visible = false;
-		susieMAD.visible = false;
-		susieLEFT.visible = false;
-		susiePAIN.visible = false;
-		queenCONFUSED.visible = false;
-		queenEXCITED.visible = false;
-		queenHAHA.visible = false;
-		queenHAPPY.visible = false;
-		queenHATE.visible = false;
-		queenIDK.visible = false;
-		queenLMAO.visible = false;
-		queenLYING.visible = false;
-		queenNICE.visible = false;
-		queenPOG.visible = false;
-		queenWHAT.visible = false;
-		queenSHOKED.visible = false;
-		queenSMUGEVIL.visible = false;
-		queenTRUE.visible = false;
-		queenWORRIED.visible = false;
-		queenBRO.visible = false;
-		queen777.visible = false;
-		gf.visible = false;
-
-		open.visible = true;
-	}
 	function cleanDialog():Void
 	{
 		var splitName:Array<String> = dialogueList[0].split(":");
