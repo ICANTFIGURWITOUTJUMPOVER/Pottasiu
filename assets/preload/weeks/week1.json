@@ -1,20 +1,19 @@
 {
 	"songs": [
-		["Bopeebo", "dad", [146, 113, 253]],
-		["Fresh", "dad", [146, 113, 253]],
-		["Dad Battle", "dad", [146, 113, 253]]
+		["palace-raid", "dad", [146, 113, 253]],
+		["killer-queen", "dad", [146, 113, 253]],
 	],
 
 	"weekCharacters": [
-		"dad",
+		"queen",
 		"bf",
 		"gf"
 	],
-	"weekBackground": "stage",
+	"weekBackground": "",
 
-	"storyName": "Daddy Dearest",
+	"storyName": "Q5U4EX7YY2E9N",
 	"weekBefore": "tutorial",
-	"weekName": "Week 1",
+	"weekName": "Queen",
 	"startUnlocked": true,
 
 	"hideStoryMode": false,
