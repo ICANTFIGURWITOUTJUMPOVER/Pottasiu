@@ -184,26 +184,35 @@ class DialogueBoxPsych extends FlxSpriteGroup
 		super();
 
 		if(song != null && song != '') {
-			FlxG.sound.playMusic(Paths.music(RoyalEncounter), 0);
-			FlxG.sound.music.fadeIn(1, 0, 0.5);
+			FlxG.sound.playMusic(Paths.music(song), 0);
+			FlxG.sound.music.fadeIn(2, 0, 1);
 		}
 		
-		bgFade = new FlxSprite(-200, -200).makeGraphic(FlxG.width * 1.3, FlxG.height * 1.3, 0xFFB3DFd8);
+		bgFade = new FlxSprite(-500, -500).makeGraphic(FlxG.width * 2, FlxG.height * 2, FlxColor.WHITE);
 		bgFade.scrollFactor.set();
+		bgFade.visible = true;
 		bgFade.alpha = 0;
 		add(bgFade);
 
 		this.dialogueList = dialogueList;
 		spawnCharacters();
 
-		box = new FlxSprite(-20, 45);
-		box.frames = Paths.getSparrowAtlas('speech_bubble_talking');
+		box = new FlxSprite(70, 370);
+		box.frames = Paths.getSparrowAtlas('speech_bubble');
 		box.scrollFactor.set();
 		box.antialiasing = ClientPrefs.globalAntialiasing;
-		box.animation.addByPrefix('normalOpen', 'Speech Bubble Normal Open', 24);
-		box.animation.addByPrefix('normal', 'speech bubble normal', 24, false);
-		box.animation.play('normalOpen', true);
+		box.animation.addByPrefix('normal', 'speech bubble normal', 24);
+		box.animation.addByPrefix('normalOpen', 'Speech Bubble Normal Open', 24, false);
+		box.animation.addByPrefix('angry', 'AHH speech bubble', 24);
+		box.animation.addByPrefix('angryOpen', 'speech bubble loud open', 24, false);
+		box.animation.addByPrefix('center-normal', 'speech bubble middle', 24);
+		box.animation.addByPrefix('center-normalOpen', 'Speech Bubble Middle Open', 24, false);
+		box.animation.addByPrefix('center-angry', 'AHH Speech Bubble middle', 24);
+		box.animation.addByPrefix('center-angryOpen', 'speech bubble Middle loud open', 24, false);
+		box.animation.play('normal', true);
 		box.visible = false;
+		box.setGraphicSize(Std.int(box.width * 0.9));
+		box.updateHitbox();
 		add(box);
 
 		startNextDialog();
@@ -212,9 +221,9 @@ class DialogueBoxPsych extends FlxSpriteGroup
 	var dialogueStarted:Bool = false;
 	var dialogueEnded:Bool = false;
 
-	public static var LEFT_CHAR_X:Float = 0;
-	public static var RIGHT_CHAR_X:Float = 0;
-	public static var DEFAULT_CHAR_Y:Float = 0;
+	public static var LEFT_CHAR_X:Float = -60;
+	public static var RIGHT_CHAR_X:Float = -100;
+	public static var DEFAULT_CHAR_Y:Float = 60;
 
 	function spawnCharacters() {
 		#if (haxe >= "4.0.0")
@@ -281,20 +290,20 @@ class DialogueBoxPsych extends FlxSpriteGroup
 			bgFade.alpha += 0.5 * elapsed;
 			if(bgFade.alpha > 0.5) bgFade.alpha = 0.5;
 
-			#if mobile
-		    var justTouched:Bool = false;
+                        #if android
+	                var justTouched:Bool = false;
 
-		    for (touch in FlxG.touches.list)
-		    {
-			    justTouched = false;
+	                for (touch in FlxG.touches.list)
+	                {
+		             justTouched = false;
 
-			    if (touch.justPressed){
-				    justTouched = true;
-			    }
-		    }
-		    #end
+		             if (touch.justPressed){
+			         justTouched = true;
+		             }
+	                }
+	                #end
 
-			if(PlayerSettings.player1.controls.ACCEPT#if mobile || justTouched #end) {
+		             if(PlayerSettings.player1.controls.ACCEPT#if android || justTouched #end) {
 				if(!daText.finishedText) {
 					if(daText != null) {
 						daText.killTheTimer();
@@ -327,6 +336,7 @@ class DialogueBoxPsych extends FlxSpriteGroup
 					daText.destroy();
 					daText = null;
 					updateBoxOffsets(box);
+					FlxG.sound.music.fadeOut(1, 0);
 				} else {
 					startNextDialog();
 				}
