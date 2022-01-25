@@ -2,7 +2,7 @@
 <project>
 	<!-- _________________________ Application Settings _________________________ -->
 
-        <app title="vs Queen" file="vsQueen" packageName="com.sawsirox.psychengine" package="com.sawsirox.psychengine" main="Main" version="0.2.7" company="SawSirox" />
+        <app title="vs Queen" file="vsQueen" packageName="com.dangenbruh.queen" package="com.dangenbruh.queen" main="Main" version="0.2.7" company="DangenBruh" />
 	
 	<haxedef name="LINC_LUA_RELATIVE_DYNAMIC_LIB"/> <!-- stable luas PUT AFTER FIRST LINE WITH APP NAME AND ETC -->
 
