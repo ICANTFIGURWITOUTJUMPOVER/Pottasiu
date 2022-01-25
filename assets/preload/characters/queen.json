@@ -65,9 +65,9 @@
 	"healthicon": "queen",
 	"flip_x": false,
 	"healthbar_colors": [
-		175,
-		102,
-		206
+		56,
+		112,
+		255
 	],
 	"camera_position": [
 		0,
