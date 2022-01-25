@@ -403,7 +403,7 @@ class DialogueBox extends FlxSpriteGroup
 					{
 						finishThing();
 						kill();
-					});
+					};
 				}
 			}
 			else
